@@ -6,6 +6,7 @@ const path = require('path');
 
 const app = express();
 
+// Middleware beállítások
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -16,6 +17,7 @@ app.use(session({
     saveUninitialized: true
 }));
 
+// Adatbázis kapcsolat
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'kyrieirving',
@@ -28,8 +30,13 @@ connection.connect(err => {
     console.log('Connected to MySQL Database.');
 });
 
+// Modellek importálása
+const Game = require('./models/gameModel');
+
+// View engine beállítás
 app.set('view engine', 'ejs');
 
+// Alap útvonalak
 app.get('/', (req, res) => {
     res.render('index');
 });
@@ -119,6 +126,25 @@ app.post('/buy_ticket', (req, res) => {
         res.redirect('/login');
     }
 });
+
+// Útvonalak beállítása
+const authRoutes = require('./routes/authRoutes');
+const gameRoutes = require('./routes/gameRoutes');
+const forumRoutes = require('./routes/forumRoutes');
+const ticketRoutes = require('./routes/ticketRoutes');
+
+app.use('/', authRoutes);
+app.use('/games', gameRoutes);
+app.use('/forum', forumRoutes);
+app.use('/tickets', (req, res, next) => {
+    Game.getAll((err, games) => {
+        if (err) {
+            return res.status(500).send('Error retrieving games');
+        }
+        req.games = games;
+        next();
+    });
+}, ticketRoutes);
 
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000');

@@ -8,7 +8,11 @@ Ticket.create = (ticket, callback) => {
 };
 
 Ticket.getByUserId = (userId, callback) => {
-    const query = 'SELECT * FROM Tickets WHERE user_id = ?';
+    const query = `
+        SELECT Tickets.*, Games.home_team_id, Games.away_team_id, Games.game_date 
+        FROM Tickets 
+        JOIN Games ON Tickets.game_id = Games.id 
+        WHERE Tickets.user_id = ?`;
     db.query(query, [userId], callback);
 };
 
