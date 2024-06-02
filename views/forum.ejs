@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fórum</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>NBA KOSÁRLABDA FÓRUM ÉS JEGYELADÁS</h1>
+        <nav>
+            <a href="/">Főoldal</a>
+            <a href="/forum">Fórum</a>
+            <a href="/games">Meccsek</a>
+            <a href="/tickets">Jegyek</a>
+            <a href="/contact">Kapcsolat</a>
+            <a href="/logout">Kijelentkezés</a>
+        </nav>
+    </header>
+    <main>
+        <h2>Fórumbejegyzések</h2>
+        <div class="content">
+            <form action="/forum" method="post">
+                <label for="title">Cím:</label>
+                <input type="text" id="title" name="title" required>
+                <label for="content">Tartalom:</label>
+                <textarea id="content" name="content" required></textarea>
+                <button type="submit">Beküldés</button>
+            </form>
+            <ul>
+                <% posts.forEach(post => { %>
+                    <li>
+                        <h3><%= post.title %></h3>
+                        <p><%= post.content %></p>
+                        <small>Írta: <%= post.user_id %> dátum: <%= post.created_at %></small>
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
+    </main>
+    <footer>
+        <div class="footer-content">
+            <div class="contact-info">
+                <h3>NBA Fórum</h3>
+                <p>Üdvözöljük az NBA Kosárlabda Fórumon és Jegyértékesítési oldalon, ahol friss információkat találhat a legújabb mérkőzésekről, jegyvásárlási lehetőségekről és közösségi megbeszélésekről!</p>
+                <p>Kapcsolat: +40 71 234 5678</p>
+                <p>Email: info@nbaforum.com</p>
+            </div>
+            <div class="quick-links">
+                <h3>Gyors linkek</h3>
+                <ul>
+                    <li><a href="/">Főoldal</a></li>
+                    <li><a href="/tickets">Jegyek</a></li>
+                    <li><a href="/forum">Fórum</a></li>
+                    <li><a href="/login">Bejelentkezés</a></li>
+                </ul>
+            </div>
+            <div class="contact-form">
+                <h3>Kapcsolat</h3>
+                <form action="/contact" method="post">
+                    <input type="email" name="email" placeholder="Email cím" required>
+                    <textarea name="message" placeholder="Üzenet..." required></textarea>
+                    <button type="submit">Küldés</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 NBA Fórum | Webtechnológia | Minden jog fenntartva</p>
+        </div>
+    </footer>
+</body>
+</html>
