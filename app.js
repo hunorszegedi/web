@@ -136,15 +136,11 @@ const ticketRoutes = require('./routes/ticketRoutes');
 app.use('/', authRoutes);
 app.use('/games', gameRoutes);
 app.use('/forum', forumRoutes);
-app.use('/tickets', (req, res, next) => {
-    Game.getAll((err, games) => {
-        if (err) {
-            return res.status(500).send('Error retrieving games');
-        }
-        req.games = games;
-        next();
-    });
-}, ticketRoutes);
+app.use('/tickets', ticketRoutes);
+
+app.get('/', (req, res) => {
+    res.render('index');
+});
 
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000');

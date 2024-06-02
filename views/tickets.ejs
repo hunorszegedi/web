@@ -25,7 +25,7 @@
                 <ul>
                     <% tickets.forEach(ticket => { %>
                         <li>
-                            <p><strong>Meccs:</strong> <%= ticket.home_team_id %> vs <%= ticket.away_team_id %> - <%= ticket.game_date %></p>
+                            <p><strong>Meccs:</strong> <%= ticket.home_team_id %> vs <%= ticket.away_team_id %> - <%= new Date(ticket.game_date).toLocaleString() %></p>
                             <p><strong>Ülőhely:</strong> <%= ticket.seat %></p>
                             <p><strong>Ár:</strong> $<%= ticket.price %></p>
                         </li>
