@@ -5,6 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jegyek</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .accordion {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #ffd700;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            text-align: left;
+            border: none;
+            outline: none;
+            transition: 0.4s;
+            margin-bottom: 5px;
+        }
+
+        .active, .accordion:hover {
+            background-color: rgba(0, 0, 0, 1);
+        }
+
+        .panel {
+            padding: 0 18px;
+            display: none;
+            background-color: rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -22,15 +47,15 @@
         <div class="main-content center-content">
             <div class="content-box">
                 <h2>Jegyeim</h2>
-                <ul>
-                    <% tickets.forEach(ticket => { %>
-                        <li>
-                            <p><strong>Meccs:</strong> <%= ticket.home_team_id %> vs <%= ticket.away_team_id %> - <%= new Date(ticket.game_date).toLocaleString() %></p>
+                <div id="accordion-container">
+                    <% tickets.forEach((ticket, index) => { %>
+                        <button class="accordion">Meccs: <%= ticket.home_team_id %> vs <%= ticket.away_team_id %> - <%= new Date(ticket.game_date).toLocaleString() %></button>
+                        <div class="panel">
                             <p><strong>Ülőhely:</strong> <%= ticket.seat %></p>
                             <p><strong>Ár:</strong> $<%= ticket.price %></p>
-                        </li>
+                        </div>
                     <% }); %>
-                </ul>
+                </div>
                 <a href="/tickets/buy" class="button">Jegy vásárlása</a>
             </div>
         </div>
@@ -65,5 +90,21 @@
             <p>&copy; 2024 NBA Fórum | Webtechnológia | Minden jog fenntartva</p>
         </div>
     </footer>
+    <script>
+        var acc = document.getElementsByClassName("accordion");
+        var i;
+
+        for (i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var panel = this.nextElementSibling;
+                if (panel.style.display === "block") {
+                    panel.style.display = "none";
+                } else {
+                    panel.style.display = "block";
+                }
+            });
+        }
+    </script>
 </body>
 </html>

@@ -28,18 +28,18 @@
                         <select id="gameId" name="gameId" required>
                             <% games.forEach(game => { %>
                                 <option value="<%= game.id %>">
-                                    <%= game.home_team_id %> vs <%= game.away_team_id %> - <%= new Date(game.game_date).toLocaleString() %>
+                                    <%= game.home_team %> vs <%= game.away_team %> - <%= new Date(game.game_date).toLocaleString() %>
                                 </option>
                             <% }); %>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="seat">Ülőhely:</label>
-                        <input type="text" id="seat" name="seat" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="price">Ár:</label>
-                        <input type="number" id="price" name="price" required step="0.01">
+                        <select id="seat" name="seat" required>
+                            <% seats.forEach(seat => { %>
+                                <option value="<%= seat.seat %>"><%= seat.seat %> - $<%= seat.price %></option>
+                            <% }); %>
+                        </select>
                     </div>
                     <button type="submit">Jegyvásárlás</button>
                 </form>
