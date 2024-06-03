@@ -85,21 +85,28 @@
             background-color: rgba(0, 0, 0, 0.8);
             color: #ffd700;
             padding: 20px 0;
+            text-align: center;
             width: 100%;
         }
 
         .footer-content {
             display: flex;
             justify-content: space-around;
-            padding: 20px;
+            flex-wrap: wrap;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: left;
         }
 
         .footer-content div {
-            width: 30%;
+            flex: 1;
+            min-width: 200px;
+            margin: 10px;
         }
 
         .footer-content h3 {
-            margin-top: 0;
+            border-bottom: 1px solid #ffd700;
+            padding-bottom: 10px;
         }
 
         .footer-content ul {
@@ -108,7 +115,7 @@
         }
 
         .footer-content ul li {
-            margin: 5px 0;
+            margin: 10px 0;
         }
 
         .footer-content ul li a {
@@ -136,6 +143,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
         }
 
         .contact-form button:hover {
@@ -143,9 +151,9 @@
         }
 
         .footer-bottom {
-            text-align: center;
-            padding: 10px;
-            background-color: rgba(0, 0, 0, 0.9);
+            border-top: 1px solid #ffd700;
+            padding-top: 10px;
+            margin-top: 20px;
         }
     </style>
 </head>

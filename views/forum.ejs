@@ -107,11 +107,81 @@
             margin-top: 20px;
         }
 
+        .heading-strip {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
         footer {
             background-color: rgba(0, 0, 0, 0.8);
             color: #ffd700;
             padding: 20px 0;
             text-align: center;
+            margin-top: 20px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .footer-content div {
+            flex: 1;
+            min-width: 200px;
+            margin: 10px;
+        }
+
+        .footer-content h3 {
+            border-bottom: 1px solid #ffd700;
+            padding-bottom: 10px;
+        }
+
+        .footer-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-content ul li {
+            margin: 10px 0;
+        }
+
+        .footer-content ul li a {
+            color: #ffd700;
+            text-decoration: none;
+        }
+
+        .footer-content form input,
+        .footer-content form textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+        }
+
+        .footer-content form button {
+            background-color: #ffd700;
+            color: #000;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .footer-content form button:hover {
+            background-color: #e5c100;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #ffd700;
+            padding-top: 10px;
             margin-top: 20px;
         }
     </style>
@@ -129,7 +199,7 @@
         </nav>
     </header>
     <div class="container">
-        <h2>Fórum</h2>
+        <h2 class="heading-strip">Fórum</h2>
         <% posts.forEach(post => { %>
             <div class="post">
                 <h3><%= post.title %></h3>
@@ -178,7 +248,34 @@
         <% } %>
     </div>
     <footer>
-        <p>NBA Kosárlabda Fórum és Jegyeladás &copy; 2023</p>
+        <div class="footer-content">
+            <div class="contact-info">
+                <h3>NBA Fórum</h3>
+                <p>Üdvözöllek az NBA Kosárlabda Fórumon és Jegyértékesítési oldalon. Alapvetően egyetemi projektként indultunk, de ha jól haladunk, még hostot is fogadunk! Friss információkat találhatsz a legújabb mérkőzésekről, jegyvásárlási lehetőségekről és közösségi megbeszélésekről!</p>
+                <p>Kapcsolat: +40 71 234 5678</p>
+                <p>Email: info@nbaforum.com</p>
+            </div>
+            <div class="quick-links">
+                <h3>Gyors linkek</h3>
+                <ul>
+                    <li><a href="/">Főoldal</a></li>
+                    <li><a href="/tickets">Jegyek</a></li>
+                    <li><a href="/forum">Fórum</a></li>
+                    <li><a href="/login">Bejelentkezés</a></li>
+                </ul>
+            </div>
+            <div class="contact-form">
+                <h3>Kapcsolat</h3>
+                <form action="/contact" method="post">
+                    <input type="email" name="email" placeholder="Email cím" required>
+                    <textarea name="message" placeholder="Üzenet..." required></textarea>
+                    <button type="submit">Küldés</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 NBA Fórum | Webtechnológia | Minden jog fenntartva</p>
+        </div>
     </footer>
 </body>
 </html>

@@ -136,6 +136,14 @@
             padding-top: 10px;
             margin-top: 20px;
         }
+
+        .heading-strip {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
     </style>
 </head>
 <body>
@@ -151,7 +159,7 @@
         </nav>
     </header>
     <main>
-        <h2>Közelgő meccsek</h2>
+        <h2 class="heading-strip">Közelgő meccsek</h2>
         <div class="content">
             <ul>
                 <% games.forEach(game => { %>
