@@ -49,6 +49,7 @@
             padding: 15px;
             margin: 15px 0;
             border-radius: 10px;
+            max-width: 100%; /* Add this line to ensure the width does not exceed the container */
         }
 
         .post h3, .comment h4 {
@@ -63,10 +64,11 @@
 
         .form-group {
             margin-bottom: 15px;
+            width: 100%; /* Add this line */
         }
 
         .form-group input, .form-group textarea {
-            width: 100%;
+            width: 95%; /* Modify this line */
             padding: 10px;
             border-radius: 5px;
             border: none;
@@ -76,6 +78,7 @@
         }
 
         .form-group button {
+            width: 95%; /* Modify this line */
             background-color: #ffd700;
             color: #000;
             padding: 10px 20px;
@@ -92,6 +95,7 @@
 
         .comments {
             margin-top: 15px;
+            max-width: 100%; /* Add this line */
         }
 
         .no-comments {
@@ -105,6 +109,7 @@
             padding: 20px;
             border-radius: 10px;
             margin-top: 20px;
+            max-width: 100%; /* Add this line */
         }
 
         .heading-strip {
@@ -112,6 +117,7 @@
             padding: 10px;
             border-radius: 5px;
             display: inline-block;
+            max-width: 100%; /* Add this line */
         }
 
         footer {
@@ -156,6 +162,10 @@
             text-decoration: none;
         }
 
+        .footer-content ul li a:hover {
+            text-decoration: underline;
+        }
+
         .footer-content form input,
         .footer-content form textarea {
             width: 100%;
@@ -191,6 +201,15 @@
             font-weight: bold;
         }
 
+        .post-title {
+            color: #ffd700; /* Az új szín */
+            text-decoration: none; /* Alapértelmezett stílus */
+        }
+
+        .post-title:hover {
+            color: #e5c100; /* Szín a hover eseményre */
+        }
+
     </style>
 </head>
 <body>
@@ -218,10 +237,9 @@
             <input type="text" name="query" placeholder="Keresés a fórumon...">
             <button type="submit">Keresés</button>
         </form>
-        <!-- Modify the forum listing in forum.ejs -->
         <% posts.forEach(post => { %>
             <div class="post">
-                <h3><a href="/forum/<%= post.id %>"><%= post.title %></a></h3>
+                <h3><a href="/forum/<%= post.id %>" class="post-title"><%= post.title %></a></h3>
                 <p><%= post.content %></p>
                 <p>Írta: <%= post.author %> - <%= post.created_at %></p>
                 <div class="comments">
@@ -255,7 +273,6 @@
                 <% } %>
             </div>
         <% }) %>
-
         <% if (role === 'admin') { %>
             <div class="create-post">
                 <h3>Új bejegyzés létrehozása</h3>

@@ -117,36 +117,31 @@ app.post('/uploadPhoto', upload.single('profilePhoto'), (req, res) => {
     }
 });
 
-app.get('/forum/:postId', (req, res) => {
-    if (req.session.loggedin) {
-        const postId = req.params.postId;
-        connection.query(
-            'SELECT Posts.*, Users.name AS author FROM Posts INNER JOIN Users ON Posts.user_id = Users.id WHERE Posts.id = ?',
-            [postId],
-            (err, postResults) => {
-                if (err) throw err;
 
-                if (postResults.length > 0) {
-                    const post = postResults[0];
-                    connection.query(
-                        'SELECT Comments.*, Users.name AS author FROM Comments INNER JOIN Users ON Comments.user_id = Users.id WHERE post_id = ?',
-                        [postId],
-                        (err, commentResults) => {
-                            if (err) throw err;
-                            post.comments = commentResults;
-                            res.render('post_detail', { post: post, user: req.session.user, role: req.session.user.role });
-                        }
-                    );
-                } else {
-                    res.send('Post not found');
-                }
+app.get('/forum/:id', (req, res) => {
+    if (req.session.loggedin) {
+        const postId = req.params.id;
+        connection.query('SELECT Posts.*, Users.name AS author FROM Posts INNER JOIN Users ON Posts.user_id = Users.id WHERE Posts.id = ?', [postId], (err, postResults) => {
+            if (err) throw err;
+            if (postResults.length > 0) {
+                const post = postResults[0];
+                connection.query('SELECT Comments.*, Users.name AS author FROM Comments INNER JOIN Users ON Comments.user_id = Users.id WHERE post_id = ?', [postId], (err, commentResults) => {
+                    if (err) throw err;
+                    post.comments = commentResults;
+                    res.render('post_detail', { 
+                        post: post,
+                        user: req.session.user,
+                        role: req.session.user.role
+                    });
+                });
+            } else {
+                res.status(404).send('Post not found');
             }
-        );
+        });
     } else {
         res.redirect('/login');
     }
 });
-
 
 app.post('/forum', (req, res) => {
     if (req.session.loggedin) {
