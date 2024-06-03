@@ -184,6 +184,12 @@
             padding-top: 10px;
             margin-top: 20px;
         }
+
+        .user-info {
+            margin-left: 15px;
+            color: #ffd700;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -195,7 +201,14 @@
             <a href="/games">Meccsek</a>
             <a href="/tickets">Jegyek</a>
             <a href="/contact">Kapcsolat</a>
-            <a href="/logout">Kijelentkezés</a>
+            <% if (user) { %>
+                <a href="/dashboard">Dashboard</a>
+                <span class="user-info">Üdv, <%= user.name %> (<%= user.role %>)</span>
+                <a href="/logout">Kijelentkezés</a>
+            <% } else { %>
+                <a href="/login">Bejelentkezés</a>
+                <a href="/register">Regisztrálás</a>
+            <% } %>
         </nav>
     </header>
     <div class="container">

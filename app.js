@@ -32,11 +32,7 @@ connection.connect(err => {
 
 // Middleware to set the role for the session
 app.use((req, res, next) => {
-    if (req.session.user) {
-        res.locals.role = req.session.user.role;
-    } else {
-        res.locals.role = null;
-    }
+    res.locals.user = req.session.user || null;
     next();
 });
 
@@ -48,11 +44,11 @@ app.set('view engine', 'ejs');
 
 // Alap útvonalak
 app.get('/', (req, res) => {
-    res.render('index');
+    res.render('index', { user: req.session.user });
 });
 
 app.get('/login', (req, res) => {
-    res.render('login');
+    res.render('login', { user: req.session.user });
 });
 
 app.post('/login', (req, res) => {
@@ -70,7 +66,7 @@ app.post('/login', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-    res.render('register');
+    res.render('register', { user: req.session.user });
 });
 
 app.post('/register', (req, res) => {
@@ -93,32 +89,34 @@ app.get('/forum', (req, res) => {
     if (req.session.loggedin) {
         connection.query('SELECT * FROM Posts', (err, posts) => {
             if (err) throw err;
-            
-            // Adjuk meg a hozzászólásokat is minden bejegyzéshez
+
+            // Add comments to each post
             let postsWithComments = [];
             let postsProcessed = 0;
 
             posts.forEach(post => {
                 connection.query('SELECT * FROM Comments WHERE post_id = ?', [post.id], (err, comments) => {
                     if (err) throw err;
-                    
+
                     post.comments = comments;
                     postsWithComments.push(post);
                     postsProcessed++;
-                    
+
                     if (postsProcessed === posts.length) {
                         res.render('forum', { 
                             posts: postsWithComments,
+                            user: req.session.user,
                             role: req.session.user.role
                         });
                     }
                 });
             });
 
-            // Ha nincs egyetlen post sem
+            // If there are no posts
             if (posts.length === 0) {
                 res.render('forum', { 
                     posts: postsWithComments,
+                    user: req.session.user,
                     role: req.session.user.role
                 });
             }
@@ -145,7 +143,7 @@ app.get('/games', (req, res) => {
     if (req.session.loggedin) {
         connection.query('SELECT * FROM Games', (err, games) => {
             if (err) throw err;
-            res.render('game', { games: games });
+            res.render('game', { games: games, user: req.session.user });
         });
     } else {
         res.redirect('/login');
@@ -185,7 +183,7 @@ app.get('/tickets', (req, res) => {
                 ticket.game_date = new Date(ticket.game_date).toLocaleString("hu-HU");
             });
 
-            res.render('tickets', { tickets: results, role: req.session.user.role });
+            res.render('tickets', { tickets: results, user: req.session.user, role: req.session.user.role });
         });
     } else {
         res.redirect('/login');
@@ -198,6 +196,27 @@ app.post('/delete_ticket', (req, res) => {
         connection.query('DELETE FROM Tickets WHERE id = ?', [ticketId], (err, results) => {
             if (err) throw err;
             res.redirect('/tickets');
+        });
+    } else {
+        res.redirect('/login');
+    }
+});
+
+app.get('/tickets/buy', (req, res) => {
+    if (req.session.loggedin) {
+        connection.query(`
+            SELECT Games.*, home_team.name AS home_team_name, away_team.name AS away_team_name
+            FROM Games
+            INNER JOIN Teams AS home_team ON Games.home_team_id = home_team.id
+            INNER JOIN Teams AS away_team ON Games.away_team_id = away_team.id
+        `, (err, games) => {
+            if (err) throw err;
+
+            connection.query('SELECT DISTINCT seat, price FROM Tickets', (err, seats) => {
+                if (err) throw err;
+
+                res.render('buy_ticket', { games: games, seats: seats, user: req.session.user });
+            });
         });
     } else {
         res.redirect('/login');
@@ -228,10 +247,6 @@ app.use('/', authRoutes);
 app.use('/games', gameRoutes);
 app.use('/forum', forumRoutes);
 app.use('/tickets', ticketRoutes);
-
-app.get('/', (req, res) => {
-    res.render('index');
-});
 
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000');
