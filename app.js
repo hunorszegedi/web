@@ -128,7 +128,6 @@ app.get('/forum', (req, res) => {
     }
 });
 
-
 app.post('/forum', (req, res) => {
     if (req.session.loggedin) {
         const { title, content } = req.body;
@@ -147,6 +146,30 @@ app.get('/games', (req, res) => {
         connection.query('SELECT * FROM Games', (err, games) => {
             if (err) throw err;
             res.render('game', { games: games });
+        });
+    } else {
+        res.redirect('/login');
+    }
+});
+
+app.get('/tickets', (req, res) => {
+    if (req.session.loggedin) {
+        const query = `
+            SELECT Tickets.*, Games.game_date, home_team.name AS home_team, away_team.name AS away_team
+            FROM Tickets
+            INNER JOIN Games ON Tickets.game_id = Games.id
+            INNER JOIN Teams AS home_team ON Games.home_team_id = home_team.id
+            INNER JOIN Teams AS away_team ON Games.away_team_id = away_team.id
+            WHERE Tickets.user_id = ?
+        `;
+        connection.query(query, [req.session.user.id], (err, results) => {
+            if (err) throw err;
+
+            results.forEach(ticket => {
+                ticket.game_date = new Date(ticket.game_date).toLocaleString("hu-HU");
+            });
+
+            res.render('tickets', { tickets: results });
         });
     } else {
         res.redirect('/login');
