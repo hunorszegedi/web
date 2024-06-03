@@ -49,10 +49,17 @@
                 <h2>Jegyeim</h2>
                 <div id="accordion-container">
                     <% tickets.forEach((ticket, index) => { %>
-                        <button class="accordion">Meccs: <%= ticket.home_team_id %> vs <%= ticket.away_team_id %> - <%= new Date(ticket.game_date).toLocaleString() %></button>
+                        <button class="accordion">Meccs: <%= ticket.home_team %> vs <%= ticket.away_team %> - <%= ticket.game_date %></button>
                         <div class="panel">
                             <p><strong>Ülőhely:</strong> <%= ticket.seat %></p>
                             <p><strong>Ár:</strong> $<%= ticket.price %></p>
+                            <% if (role === 'admin' || role === 'moderator') { %>
+                                <p><strong>Felhasználó:</strong> <%= ticket.user_name %></p>
+                                <form action="/delete_ticket" method="POST" onsubmit="return confirm('Biztosan törölni szeretnéd ezt a jegyet?');">
+                                    <input type="hidden" name="ticketId" value="<%= ticket.id %>">
+                                    <button type="submit">Törlés</button>
+                                </form>
+                            <% } %>
                         </div>
                     <% }); %>
                 </div>

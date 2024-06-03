@@ -154,27 +154,56 @@ app.get('/games', (req, res) => {
 
 app.get('/tickets', (req, res) => {
     if (req.session.loggedin) {
-        const query = `
-            SELECT Tickets.*, Games.game_date, home_team.name AS home_team, away_team.name AS away_team
-            FROM Tickets
-            INNER JOIN Games ON Tickets.game_id = Games.id
-            INNER JOIN Teams AS home_team ON Games.home_team_id = home_team.id
-            INNER JOIN Teams AS away_team ON Games.away_team_id = away_team.id
-            WHERE Tickets.user_id = ?
-        `;
-        connection.query(query, [req.session.user.id], (err, results) => {
+        let query;
+        const params = [];
+
+        if (req.session.user.role === 'admin' || req.session.user.role === 'moderator') {
+            query = `
+                SELECT Tickets.*, Games.game_date, home_team.name AS home_team, away_team.name AS away_team, Users.name AS user_name
+                FROM Tickets
+                INNER JOIN Games ON Tickets.game_id = Games.id
+                INNER JOIN Teams AS home_team ON Games.home_team_id = home_team.id
+                INNER JOIN Teams AS away_team ON Games.away_team_id = away_team.id
+                INNER JOIN Users ON Tickets.user_id = Users.id
+            `;
+        } else {
+            query = `
+                SELECT Tickets.*, Games.game_date, home_team.name AS home_team, away_team.name AS away_team
+                FROM Tickets
+                INNER JOIN Games ON Tickets.game_id = Games.id
+                INNER JOIN Teams AS home_team ON Games.home_team_id = home_team.id
+                INNER JOIN Teams AS away_team ON Games.away_team_id = away_team.id
+                WHERE Tickets.user_id = ?
+            `;
+            params.push(req.session.user.id);
+        }
+
+        connection.query(query, params, (err, results) => {
             if (err) throw err;
 
             results.forEach(ticket => {
                 ticket.game_date = new Date(ticket.game_date).toLocaleString("hu-HU");
             });
 
-            res.render('tickets', { tickets: results });
+            res.render('tickets', { tickets: results, role: req.session.user.role });
         });
     } else {
         res.redirect('/login');
     }
 });
+
+app.post('/delete_ticket', (req, res) => {
+    if (req.session.loggedin && (req.session.user.role === 'admin' || req.session.user.role === 'moderator')) {
+        const { ticketId } = req.body;
+        connection.query('DELETE FROM Tickets WHERE id = ?', [ticketId], (err, results) => {
+            if (err) throw err;
+            res.redirect('/tickets');
+        });
+    } else {
+        res.redirect('/login');
+    }
+});
+
 
 app.post('/buy_ticket', (req, res) => {
     if (req.session.loggedin) {
