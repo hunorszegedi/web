@@ -12,4 +12,9 @@ Comment.getAllByPostId = (postId, callback) => {
     db.query(query, [postId], callback);
 };
 
+Comment.delete = (commentId, callback) => {
+    const query = 'DELETE FROM Comments WHERE id = ?';
+    db.query(query, [commentId], callback);
+};
+
 module.exports = Comment;

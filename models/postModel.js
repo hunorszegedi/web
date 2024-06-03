@@ -9,7 +9,12 @@ Post.create = (post, callback) => {
 
 Post.getAll = (callback) => {
     const query = 'SELECT * FROM Posts';
-    db.query(query, callback);
+    db.query(query, [], callback);
+};
+
+Post.delete = (postId, callback) => {
+    const query = 'DELETE FROM Posts WHERE id = ?';
+    db.query(query, [postId], callback);
 };
 
 module.exports = Post;

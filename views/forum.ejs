@@ -5,6 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fórum</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('/images/background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            text-align: center;
+            color: #ffd700;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+
+        nav {
+            margin-top: 10px;
+        }
+
+        nav a {
+            color: #ffd700;
+            margin: 0 15px;
+            text-decoration: none;
+            font-size: 1.1em;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .post, .comment {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+        }
+
+        .post h3, .comment h4 {
+            margin: 0 0 10px;
+            color: #ffd700;
+        }
+
+        .post p, .comment p {
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            margin-top: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #000;
+        }
+
+        .form-group button {
+            background-color: #ffd700;
+            color: #000;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .form-group button:hover {
+            background-color: #e5c100;
+        }
+
+        .comments {
+            margin-top: 15px;
+        }
+
+        .no-comments {
+            margin-top: 15px;
+            text-align: center;
+            color: #ffd700;
+        }
+
+        .create-post {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        footer {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #ffd700;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -18,56 +128,57 @@
             <a href="/logout">Kijelentkezés</a>
         </nav>
     </header>
-    <main>
-        <h2>Fórumbejegyzések</h2>
-        <div class="content">
-            <form action="/forum" method="post">
-                <label for="title">Cím:</label>
-                <input type="text" id="title" name="title" required>
-                <label for="content">Tartalom:</label>
-                <textarea id="content" name="content" required></textarea>
-                <button type="submit">Beküldés</button>
-            </form>
-            <ul>
-                <% posts.forEach(post => { %>
-                    <li>
-                        <h3><%= post.title %></h3>
-                        <p><%= post.content %></p>
-                        <small>Írta: <%= post.user_id %> dátum: <%= post.created_at %></small>
-                    </li>
-                <% }); %>
-            </ul>
-        </div>
-    </main>
-    <footer>
-        <div class="footer-content">
-            <div class="contact-info">
-                <h3>NBA Fórum</h3>
-                <p>Üdvözöllek az NBA Kosárlabda Fórumon és Jegyértékesítési oldalon. Alapvetően egyetemi projektként indultunk, de ha jól haladunk, még hostot is fogadunk! Friss információkat találhatsz a legújabb mérkőzésekről, jegyvásárlási lehetőségekről és közösségi megbeszélésekről!</p>
-                <p>Kapcsolat: +40 71 234 5678</p>
-                <p>Email: info@nbaforum.com</p>
+    <div class="container">
+        <h2>Fórum</h2>
+        <% posts.forEach(post => { %>
+            <div class="post">
+                <h3><%= post.title %></h3>
+                <p><%= post.content %></p>
+                <p>Írta: <%= post.author %> - <%= post.created_at %></p>
+                <div class="comments">
+                    <h4>Hozzászólások:</h4>
+                    <% if (post.comments && post.comments.length > 0) { %>
+                        <% post.comments.forEach(comment => { %>
+                            <div class="comment">
+                                <p><%= comment.content %></p>
+                                <p>Írta: <%= comment.author %> - <%= comment.created_at %></p>
+                                <% if (role === 'admin' || role === 'moderator') { %>
+                                    <form action="/forum/deleteComment/<%= comment.id %>" method="POST" style="display:inline;">
+                                        <button type="submit">Törlés</button>
+                                    </form>
+                                <% } %>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <p class="no-comments">Nincsenek hozzászólások.</p>
+                    <% } %>
+                    <% if (role === 'admin' || role === 'user') { %>
+                        <form action="/forum/addComment/<%= post.id %>" method="POST" class="form-group">
+                            <textarea name="content" placeholder="Hozzászólás..."></textarea>
+                            <button type="submit">Hozzászólás</button>
+                        </form>
+                    <% } %>
+                </div>
+                <% if (role === 'admin' || role === 'moderator') { %>
+                    <form action="/forum/deletePost/<%= post.id %>" method="POST" style="display:inline;">
+                        <button type="submit">Törlés</button>
+                    </form>
+                <% } %>
             </div>
-            <div class="quick-links">
-                <h3>Gyors linkek</h3>
-                <ul>
-                    <li><a href="/">Főoldal</a></li>
-                    <li><a href="/tickets">Jegyek</a></li>
-                    <li><a href="/forum">Fórum</a></li>
-                    <li><a href="/login">Bejelentkezés</a></li>
-                </ul>
-            </div>
-            <div class="contact-form">
-                <h3>Kapcsolat</h3>
-                <form action="/contact" method="post">
-                    <input type="email" name="email" placeholder="Email cím" required>
-                    <textarea name="message" placeholder="Üzenet..." required></textarea>
-                    <button type="submit">Küldés</button>
+        <% }) %>
+        <% if (role === 'admin') { %>
+            <div class="create-post">
+                <h3>Új bejegyzés létrehozása</h3>
+                <form action="/forum/addPost" method="POST" class="form-group">
+                    <input type="text" name="title" placeholder="Cím">
+                    <textarea name="content" placeholder="Tartalom"></textarea>
+                    <button type="submit">Új bejegyzés</button>
                 </form>
             </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 NBA Fórum | Webtechnológia | Minden jog fenntartva</p>
-        </div>
+        <% } %>
+    </div>
+    <footer>
+        <p>NBA Kosárlabda Fórum és Jegyeladás &copy; 2023</p>
     </footer>
 </body>
 </html>

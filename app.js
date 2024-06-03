@@ -30,6 +30,16 @@ connection.connect(err => {
     console.log('Connected to MySQL Database.');
 });
 
+// Middleware to set the role for the session
+app.use((req, res, next) => {
+    if (req.session.user) {
+        res.locals.role = req.session.user.role;
+    } else {
+        res.locals.role = null;
+    }
+    next();
+});
+
 // Modellek importálása
 const Game = require('./models/gameModel');
 
@@ -83,12 +93,41 @@ app.get('/forum', (req, res) => {
     if (req.session.loggedin) {
         connection.query('SELECT * FROM Posts', (err, posts) => {
             if (err) throw err;
-            res.render('forum', { posts: posts });
+            
+            // Adjuk meg a hozzászólásokat is minden bejegyzéshez
+            let postsWithComments = [];
+            let postsProcessed = 0;
+
+            posts.forEach(post => {
+                connection.query('SELECT * FROM Comments WHERE post_id = ?', [post.id], (err, comments) => {
+                    if (err) throw err;
+                    
+                    post.comments = comments;
+                    postsWithComments.push(post);
+                    postsProcessed++;
+                    
+                    if (postsProcessed === posts.length) {
+                        res.render('forum', { 
+                            posts: postsWithComments,
+                            role: req.session.user.role
+                        });
+                    }
+                });
+            });
+
+            // Ha nincs egyetlen post sem
+            if (posts.length === 0) {
+                res.render('forum', { 
+                    posts: postsWithComments,
+                    role: req.session.user.role
+                });
+            }
         });
     } else {
         res.redirect('/login');
     }
 });
+
 
 app.post('/forum', (req, res) => {
     if (req.session.loggedin) {
