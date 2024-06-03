@@ -59,6 +59,10 @@ app.get('/', (req, res) => {
     res.render('index', { user: req.session.user });
 });
 
+app.get('/contact', (req, res) => {
+    res.redirect('/');
+});
+
 app.get('/login', (req, res) => {
     res.render('login', { user: req.session.user });
 });
