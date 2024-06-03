@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const connection = require('../config/db');
 
-// Jegyek listázása
 router.get('/', (req, res) => {
     if (!req.session || !req.session.user || !req.session.user.id) {
         return res.status(401).send('User not logged in');
@@ -16,7 +15,6 @@ router.get('/', (req, res) => {
     });
 });
 
-// Jegyvásárlási oldal megjelenítése
 router.get('/buy', (req, res) => {
     connection.query('SELECT Games.id, home_team.name AS home_team, away_team.name AS away_team, Games.game_date FROM Games JOIN Teams AS home_team ON Games.home_team_id = home_team.id JOIN Teams AS away_team ON Games.away_team_id = away_team.id', (err, games) => {
         if (err) {
@@ -31,7 +29,6 @@ router.get('/buy', (req, res) => {
     });
 });
 
-// Jegyvásárlás kezelése
 router.post('/buy', (req, res) => {
     if (!req.session || !req.session.user || !req.session.user.id) {
         return res.status(401).send('User not logged in');
@@ -39,7 +36,7 @@ router.post('/buy', (req, res) => {
 
     const { gameId, seat } = req.body;
     const userId = req.session.user.id;
-    // Lekérdezzük az árat a kiválasztott helyhez
+    
     connection.query('SELECT price FROM Tickets WHERE seat = ? AND game_id = ?', [seat, gameId], (err, results) => {
         if (err) {
             return res.status(500).send('Error retrieving seat price');

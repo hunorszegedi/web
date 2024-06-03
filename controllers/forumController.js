@@ -7,7 +7,6 @@ exports.listPosts = (req, res) => {
             return res.status(500).send('Error retrieving posts');
         }
         
-        // Kommentek betöltése minden poszthoz
         const postsWithComments = posts.map(post => {
             return new Promise((resolve, reject) => {
                 Comment.getAllByPostId(post.id, (err, comments) => {
@@ -23,7 +22,7 @@ exports.listPosts = (req, res) => {
 
         Promise.all(postsWithComments)
             .then(posts => {
-                const userRole = req.session.user.role; // Hozzáadjuk a felhasználói szerepkört
+                const userRole = req.session.user.role;
                 res.render('forum', { posts, role: userRole });
             })
             .catch(err => {

@@ -3,22 +3,20 @@ const mysql = require('mysql2');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
-const multer = require('multer'); // Multer importálása
+const multer = require('multer'); 
 
 const app = express();
 
-// Multer konfiguráció
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'public/images'); // A fájlok mentési helye
+        cb(null, 'public/images'); 
     },
     filename: (req, file, cb) => {
-        cb(null, `${req.session.user.id}_${file.originalname}`); // Egyedi fájlnév létrehozása
+        cb(null, `${req.session.user.id}_${file.originalname}`); 
     }
 });
 const upload = multer({ storage: storage });
 
-// Middleware beállítások
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -29,7 +27,6 @@ app.use(session({
     saveUninitialized: true
 }));
 
-// Adatbázis kapcsolat
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'kyrieirving',
@@ -42,19 +39,15 @@ connection.connect(err => {
     console.log('Connected to MySQL Database.');
 });
 
-// Middleware to set the role for the session
 app.use((req, res, next) => {
     res.locals.user = req.session.user || null;
     next();
 });
 
-// Modellek importálása
 const Game = require('./models/gameModel');
 
-// View engine beállítás
 app.set('view engine', 'ejs');
 
-// Alap útvonalak
 app.get('/', (req, res) => {
     res.render('index', { user: req.session.user });
 });
@@ -169,7 +162,6 @@ app.get('/forum/search', (req, res) => {
             (err, posts) => {
                 if (err) throw err;
 
-                // Add comments to each post
                 let postsWithComments = [];
                 let postsProcessed = 0;
 
@@ -191,7 +183,6 @@ app.get('/forum/search', (req, res) => {
                     });
                 });
 
-                // If there are no posts
                 if (posts.length === 0) {
                     res.render('forum', { 
                         posts: postsWithComments,
@@ -315,7 +306,6 @@ app.post('/buy_ticket', (req, res) => {
     }
 });
 
-// Útvonalak beállítása
 const authRoutes = require('./routes/authRoutes');
 const gameRoutes = require('./routes/gameRoutes');
 const forumRoutes = require('./routes/forumRoutes');

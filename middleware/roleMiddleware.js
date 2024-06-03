@@ -1,4 +1,3 @@
-// middleware/roleMiddleware.js
 function ensureAuthenticated(req, res, next) {
     if (req.session.loggedin) {
         return next();

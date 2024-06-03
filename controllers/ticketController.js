@@ -41,7 +41,7 @@ exports.buyTicket = (req, res) => {
 
     const { gameId, seat } = req.body;
     const userId = req.session.user.id;
-    // Fetch the price for the selected seat from the database
+    
     connection.query('SELECT price FROM Tickets WHERE game_id = ? AND seat = ?', [gameId, seat], (err, results) => {
         if (err) {
             return res.status(500).send('Error retrieving seat price');
