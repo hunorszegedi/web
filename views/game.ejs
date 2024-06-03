@@ -13,57 +13,72 @@
             color: #fff;
             margin: 0;
             padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
         header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
             background-color: rgba(0, 0, 0, 0.8);
             padding: 20px;
             text-align: center;
-            color: #ffd700;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 2em;
-        }
-
-        nav {
-            margin-top: 10px;
-        }
-
-        nav a {
-            color: #ffd700;
-            margin: 0 15px;
-            text-decoration: none;
-            font-size: 1.1em;
+            z-index: 1000;
         }
 
         main {
-            padding: 20px;
-            max-width: 900px;
-            margin: 0 auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 120px;
+            padding-bottom: 60px;
+            width: 100%;
         }
 
-        .content ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .content li {
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 20px;
-            margin: 20px 0;
+        .form-container {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 40px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 300px;
+            text-align: center;
         }
 
-        .content li p {
-            margin: 10px 0;
-            line-height: 1.6;
-        }
-
-        .content li p strong {
+        .form-container h2 {
+            margin-bottom: 20px;
             color: #ffd700;
+        }
+
+        .form-container input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            background: #fff;
+        }
+
+        .form-container button {
+            background-color: #ffd700;
+            color: #000;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .form-container button:hover {
+            background-color: #e5c100;
         }
 
         footer {
@@ -71,7 +86,7 @@
             color: #ffd700;
             padding: 20px 0;
             text-align: center;
-            margin-top: 20px;
+            width: 100%;
         }
 
         .footer-content {
@@ -108,8 +123,12 @@
             text-decoration: none;
         }
 
-        .footer-content form input,
-        .footer-content form textarea {
+        .footer-content ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
@@ -117,7 +136,7 @@
             border: none;
         }
 
-        .footer-content form button {
+        .contact-form button {
             background-color: #ffd700;
             color: #000;
             padding: 10px 20px;
@@ -127,7 +146,7 @@
             font-size: 16px;
         }
 
-        .footer-content form button:hover {
+        .contact-form button:hover {
             background-color: #e5c100;
         }
 
@@ -137,17 +156,39 @@
             margin-top: 20px;
         }
 
+        .user-info {
+            margin-left: 15px;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .games-table {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .games-table th, .games-table td {
+            padding: 10px;
+            border: 1px solid #ffd700;
+        }
+
+        .games-table th {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #ffd700;
+        }
+
+        .games-table td {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
         .heading-strip {
             background-color: rgba(0, 0, 0, 0.5);
             padding: 10px;
             border-radius: 5px;
             display: inline-block;
-        }
-        
-        .user-info {
-            margin-left: 15px;
-            color: #ffd700;
-            font-weight: bold;
         }
 
     </style>
@@ -156,11 +197,7 @@
     <header>
         <h1>NBA KOSÁRLABDA FÓRUM ÉS JEGYÉRTÉKESÍTÉS</h1>
         <nav>
-            <a href="/">Főoldal</a>
-            <a href="/forum">Fórum</a>
-            <a href="/games">Meccsek</a>
-            <a href="/tickets">Jegyek</a>
-            <a href="/contact">Kapcsolat</a>
+            <a href="/">Haza</a>
             <% if (user) { %>
                 <a href="/dashboard">Dashboard</a>
                 <span class="user-info">Üdv, <%= user.name %> (<%= user.role %>)</span>
@@ -172,18 +209,28 @@
         </nav>
     </header>
     <main>
-        <h2 class="heading-strip">Közelgő meccsek</h2>
-        <div class="content">
-            <ul>
-                <% games.forEach(game => { %>
-                    <li>
-                        <p><strong>Hazai csapat:</strong> <%= game.home_team_id %></p>
-                        <p><strong>Vendég csapat:</strong> <%= game.away_team_id %></p>
-                        <p><strong>Arena:</strong> <%= game.arena_id %></p>
-                        <p><strong>Dátum:</strong> <%= game.game_date %></p>
-                    </li>
-                <% }); %>
-            </ul>
+        <div class="main-content">
+            <h2 class="heading-strip">Meccsek</h2>
+            <table class="games-table">
+                <thead>
+                    <tr>
+                        <th>Hazai Csapat</th>
+                        <th>Vendég Csapat</th>
+                        <th>Aréna</th>
+                        <th>Meccs Dátuma</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% games.forEach(game => { %>
+                        <tr>
+                            <td><%= game.home_team_name %></td>
+                            <td><%= game.away_team_name %></td>
+                            <td><%= game.arena_name %></td>
+                            <td><%= new Date(game.game_date).toLocaleString() %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
         </div>
     </main>
     <footer>

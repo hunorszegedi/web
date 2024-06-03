@@ -141,7 +141,16 @@ app.post('/forum', (req, res) => {
 
 app.get('/games', (req, res) => {
     if (req.session.loggedin) {
-        connection.query('SELECT * FROM Games', (err, games) => {
+        connection.query(`
+            SELECT Games.*, 
+                   home_team.name AS home_team_name, 
+                   away_team.name AS away_team_name, 
+                   Arenas.name AS arena_name
+            FROM Games
+            INNER JOIN Teams AS home_team ON Games.home_team_id = home_team.id
+            INNER JOIN Teams AS away_team ON Games.away_team_id = away_team.id
+            INNER JOIN Arenas ON Games.arena_id = Arenas.id
+        `, (err, games) => {
             if (err) throw err;
             res.render('game', { games: games, user: req.session.user });
         });
@@ -149,6 +158,7 @@ app.get('/games', (req, res) => {
         res.redirect('/login');
     }
 });
+
 
 app.get('/tickets', (req, res) => {
     if (req.session.loggedin) {
