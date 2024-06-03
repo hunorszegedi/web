@@ -139,6 +139,53 @@ app.post('/forum', (req, res) => {
     }
 });
 
+app.get('/forum/search', (req, res) => {
+    if (req.session.loggedin) {
+        const searchQuery = req.query.query;
+        connection.query(
+            'SELECT Posts.*, Users.name AS author FROM Posts INNER JOIN Users ON Posts.user_id = Users.id WHERE Posts.title LIKE ? OR Posts.content LIKE ?',
+            [`%${searchQuery}%`, `%${searchQuery}%`],
+            (err, posts) => {
+                if (err) throw err;
+
+                // Add comments to each post
+                let postsWithComments = [];
+                let postsProcessed = 0;
+
+                posts.forEach(post => {
+                    connection.query('SELECT Comments.*, Users.name AS author FROM Comments INNER JOIN Users ON Comments.user_id = Users.id WHERE post_id = ?', [post.id], (err, comments) => {
+                        if (err) throw err;
+
+                        post.comments = comments;
+                        postsWithComments.push(post);
+                        postsProcessed++;
+
+                        if (postsProcessed === posts.length) {
+                            res.render('forum', { 
+                                posts: postsWithComments,
+                                user: req.session.user,
+                                role: req.session.user.role
+                            });
+                        }
+                    });
+                });
+
+                // If there are no posts
+                if (posts.length === 0) {
+                    res.render('forum', { 
+                        posts: postsWithComments,
+                        user: req.session.user,
+                        role: req.session.user.role
+                    });
+                }
+            }
+        );
+    } else {
+        res.redirect('/login');
+    }
+});
+
+
 app.get('/games', (req, res) => {
     if (req.session.loggedin) {
         connection.query(`

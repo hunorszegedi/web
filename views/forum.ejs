@@ -190,6 +190,7 @@
             color: #ffd700;
             font-weight: bold;
         }
+
     </style>
 </head>
 <body>
@@ -213,6 +214,10 @@
     </header>
     <div class="container">
         <h2 class="heading-strip">Fórum</h2>
+        <form action="/forum/search" method="GET">
+            <input type="text" name="query" placeholder="Keresés a fórumon...">
+            <button type="submit">Keresés</button>
+        </form>
         <% posts.forEach(post => { %>
             <div class="post">
                 <h3><%= post.title %></h3>
