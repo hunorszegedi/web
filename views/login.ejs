@@ -5,10 +5,183 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bejelentkezés</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('/images/background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 120px; /* Ensure space for the header */
+            padding-bottom: 60px; /* Ensure space for the footer */
+            width: 100%;
+        }
+
+        .form-container {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 300px;
+            text-align: center;
+        }
+
+        .form-container h2 {
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+
+        .form-container input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            background: #fff;
+        }
+
+        .form-container button {
+            background-color: #ffd700;
+            color: #000;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .form-container button:hover {
+            background-color: #e5c100;
+        }
+
+        .form-container a {
+            color: #ffd700;
+            display: block;
+            margin-top: 10px;
+            text-decoration: none;
+        }
+
+        .example-users {
+            margin-top: 20px;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .example-users h3 {
+            color: #ffd700;
+            margin-top: 0;
+        }
+
+        .example-users ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .example-users ul li {
+            margin: 5px 0;
+            color: #fff;
+        }
+
+        footer {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #ffd700;
+            padding: 20px 0;
+            width: 100%;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+        }
+
+        .footer-content div {
+            width: 30%;
+        }
+
+        .footer-content h3 {
+            margin-top: 0;
+        }
+
+        .footer-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-content ul li {
+            margin: 5px 0;
+        }
+
+        .footer-content ul li a {
+            color: #ffd700;
+            text-decoration: none;
+        }
+
+        .footer-content ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+        }
+
+        .contact-form button {
+            background-color: #ffd700;
+            color: #000;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .contact-form button:hover {
+            background-color: #e5c100;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+    </style>
 </head>
 <body>
     <header>
-        <h1>NBA KOSÁRLABDA FÓRUM ÉS JEGYELADÁS</h1>
+        <h1>NBA KOSÁRLABDA FÓRUM ÉS JEGYÉRTÉKESÍTÉS</h1>
         <nav>
             <a href="/">Haza</a>
             <a href="/login">Bejelentkezés</a>
@@ -16,21 +189,22 @@
         </nav>
     </header>
     <main>
-        <h2>BEJELENTKEZÉS</h2>
-        <div class="content">
+        <div class="form-container">
+            <h2>Bejelentkezés</h2>
             <form action="/login" method="post">
-                <label for="email">Email cím:</label>
-                <input type="email" id="email" name="email" required>
-                <label for="password">Jelszó:</label>
-                <input type="password" id="password" name="password" required>
+                <input type="email" id="email" name="email" placeholder="Email cím" required>
+                <input type="password" id="password" name="password" placeholder="Jelszó" required>
                 <button type="submit">Bejelentkezés</button>
             </form>
-            <h3>Példa felhasználók:</h3>
-            <ul>
-                <li>lebron.james@example.com Szerep: user Jelszó: lebron123</li>
-                <li>steph.curry@example.com Szerep: moderator Jelszó: curry30</li>
-                <li>kevin.durant@example.com Szerep: admin Jelszó: durantula</li>
-            </ul>
+            <a href="/register">Még nincs fiókod? Regisztrálj!</a>
+            <div class="example-users">
+                <h3>Példa felhasználók:</h3>
+                <ul>
+                    <li>lebron.james@example.com Szerep: user Jelszó: lebron123</li>
+                    <li>steph.curry@example.com Szerep: moderator Jelszó: curry30</li>
+                    <li>kevin.durant@example.com Szerep: admin Jelszó: durantula</li>
+                </ul>
+            </div>
         </div>
     </main>
     <footer>
