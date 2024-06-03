@@ -117,46 +117,36 @@ app.post('/uploadPhoto', upload.single('profilePhoto'), (req, res) => {
     }
 });
 
-app.get('/forum', (req, res) => {
+app.get('/forum/:postId', (req, res) => {
     if (req.session.loggedin) {
-        connection.query('SELECT * FROM Posts', (err, posts) => {
-            if (err) throw err;
+        const postId = req.params.postId;
+        connection.query(
+            'SELECT Posts.*, Users.name AS author FROM Posts INNER JOIN Users ON Posts.user_id = Users.id WHERE Posts.id = ?',
+            [postId],
+            (err, postResults) => {
+                if (err) throw err;
 
-            // Add comments to each post
-            let postsWithComments = [];
-            let postsProcessed = 0;
-
-            posts.forEach(post => {
-                connection.query('SELECT * FROM Comments WHERE post_id = ?', [post.id], (err, comments) => {
-                    if (err) throw err;
-
-                    post.comments = comments;
-                    postsWithComments.push(post);
-                    postsProcessed++;
-
-                    if (postsProcessed === posts.length) {
-                        res.render('forum', { 
-                            posts: postsWithComments,
-                            user: req.session.user,
-                            role: req.session.user.role
-                        });
-                    }
-                });
-            });
-
-            // If there are no posts
-            if (posts.length === 0) {
-                res.render('forum', { 
-                    posts: postsWithComments,
-                    user: req.session.user,
-                    role: req.session.user.role
-                });
+                if (postResults.length > 0) {
+                    const post = postResults[0];
+                    connection.query(
+                        'SELECT Comments.*, Users.name AS author FROM Comments INNER JOIN Users ON Comments.user_id = Users.id WHERE post_id = ?',
+                        [postId],
+                        (err, commentResults) => {
+                            if (err) throw err;
+                            post.comments = commentResults;
+                            res.render('post_detail', { post: post, user: req.session.user, role: req.session.user.role });
+                        }
+                    );
+                } else {
+                    res.send('Post not found');
+                }
             }
-        });
+        );
     } else {
         res.redirect('/login');
     }
 });
+
 
 app.post('/forum', (req, res) => {
     if (req.session.loggedin) {

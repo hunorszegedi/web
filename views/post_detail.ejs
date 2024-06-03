@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fórum</title>
+    <title><%= post.title %> - Fórum</title>
     <link rel="stylesheet" href="/css/styles.css">
     <style>
         body {
@@ -100,20 +100,6 @@
             color: #ffd700;
         }
 
-        .create-post {
-            background-color: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-
-        .heading-strip {
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 10px;
-            border-radius: 5px;
-            display: inline-block;
-        }
-
         footer {
             background-color: rgba(0, 0, 0, 0.8);
             color: #ffd700;
@@ -156,8 +142,12 @@
             text-decoration: none;
         }
 
-        .footer-content form input,
-        .footer-content form textarea {
+        .footer-content ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
@@ -165,7 +155,7 @@
             border: none;
         }
 
-        .footer-content form button {
+        .contact-form button {
             background-color: #ffd700;
             color: #000;
             padding: 10px 20px;
@@ -175,7 +165,7 @@
             font-size: 16px;
         }
 
-        .footer-content form button:hover {
+        .contact-form button:hover {
             background-color: #e5c100;
         }
 
@@ -213,58 +203,39 @@
         </nav>
     </header>
     <div class="container">
-        <h2 class="heading-strip">Fórum</h2>
-        <form action="/forum/search" method="GET">
-            <input type="text" name="query" placeholder="Keresés a fórumon...">
-            <button type="submit">Keresés</button>
-        </form>
-        <!-- Modify the forum listing in forum.ejs -->
-        <% posts.forEach(post => { %>
-            <div class="post">
-                <h3><a href="/forum/<%= post.id %>"><%= post.title %></a></h3>
-                <p><%= post.content %></p>
-                <p>Írta: <%= post.author %> - <%= post.created_at %></p>
-                <div class="comments">
-                    <h4>Hozzászólások:</h4>
-                    <% if (post.comments && post.comments.length > 0) { %>
-                        <% post.comments.forEach(comment => { %>
-                            <div class="comment">
-                                <p><%= comment.content %></p>
-                                <p>Írta: <%= comment.author %> - <%= comment.created_at %></p>
-                                <% if (role === 'admin' || role === 'moderator') { %>
-                                    <form action="/forum/deleteComment/<%= comment.id %>" method="POST" style="display:inline;">
-                                        <button type="submit">Törlés</button>
-                                    </form>
-                                <% } %>
-                            </div>
-                        <% }) %>
-                    <% } else { %>
-                        <p class="no-comments">Nincsenek hozzászólások.</p>
-                    <% } %>
-                    <% if (role === 'admin' || role === 'user') { %>
-                        <form action="/forum/addComment/<%= post.id %>" method="POST" class="form-group">
-                            <textarea name="content" placeholder="Hozzászólás..."></textarea>
-                            <button type="submit">Hozzászólás</button>
-                        </form>
-                    <% } %>
-                </div>
-                <% if (role === 'admin' || role === 'moderator') { %>
-                    <form action="/forum/deletePost/<%= post.id %>" method="POST" style="display:inline;">
-                        <button type="submit">Törlés</button>
-                    </form>
-                <% } %>
-            </div>
-        <% }) %>
-
-        <% if (role === 'admin') { %>
-            <div class="create-post">
-                <h3>Új bejegyzés létrehozása</h3>
-                <form action="/forum/addPost" method="POST" class="form-group">
-                    <input type="text" name="title" placeholder="Cím">
-                    <textarea name="content" placeholder="Tartalom"></textarea>
-                    <button type="submit">Új bejegyzés</button>
+        <div class="post">
+            <h3><%= post.title %></h3>
+            <p><%= post.content %></p>
+            <p>Írta: <%= post.author %> - <%= post.created_at %></p>
+        </div>
+        <div class="comments">
+            <h4>Hozzászólások:</h4>
+            <% if (post.comments && post.comments.length > 0) { %>
+                <% post.comments.forEach(comment => { %>
+                    <div class="comment">
+                        <p><%= comment.content %></p>
+                        <p>Írta: <%= comment.author %> - <%= comment.created_at %></p>
+                        <% if (role === 'admin' || role === 'moderator') { %>
+                            <form action="/forum/deleteComment/<%= comment.id %>" method="POST" style="display:inline;">
+                                <button type="submit">Törlés</button>
+                            </form>
+                        <% } %>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p class="no-comments">Nincsenek hozzászólások.</p>
+            <% } %>
+            <% if (role === 'admin' || role === 'user') { %>
+                <form action="/forum/addComment/<%= post.id %>" method="POST" class="form-group">
+                    <textarea name="content" placeholder="Hozzászólás..."></textarea>
+                    <button type="submit">Hozzászólás</button>
                 </form>
-            </div>
+            <% } %>
+        </div>
+        <% if (role === 'admin' || role === 'moderator') { %>
+            <form action="/forum/deletePost/<%= post.id %>" method="POST" style="display:inline;">
+                <button type="submit">Törlés</button>
+            </form>
         <% } %>
     </div>
     <footer>
