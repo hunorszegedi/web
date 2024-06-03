@@ -1,10 +1,11 @@
 const Post = require('../models/postModel');
 const Comment = require('../models/commentModel');
 
+// forum bejegyzesek listazasa
 exports.listPosts = (req, res) => {
     Post.getAll((err, posts) => {
         if (err) {
-            return res.status(500).send('Error retrieving posts');
+            return res.status(500).send('Error retrieving posts'); // hiba eseten visszateres
         }
         
         const postsWithComments = posts.map(post => {
@@ -13,7 +14,7 @@ exports.listPosts = (req, res) => {
                     if (err) {
                         reject(err);
                     } else {
-                        post.comments = comments;
+                        post.comments = comments; // hozzaszolasok hozzaadasa a bejegyzeshez
                         resolve(post);
                     }
                 });
@@ -23,15 +24,15 @@ exports.listPosts = (req, res) => {
         Promise.all(postsWithComments)
             .then(posts => {
                 const userRole = req.session.user.role;
-                res.render('forum', { posts, role: userRole });
+                res.render('forum', { posts, role: userRole }); // forum oldal renderelese
             })
             .catch(err => {
-                res.status(500).send('Error retrieving comments');
+                res.status(500).send('Error retrieving comments'); // hiba eseten visszateres
             });
     });
 };
 
-
+// uj bejegyzes letrehozasa
 exports.createPost = (req, res) => {
     const { title, content } = req.body;
     const userId = req.session.user.id;
@@ -44,12 +45,13 @@ exports.createPost = (req, res) => {
 
     Post.create(newPost, (err, results) => {
         if (err) {
-            return res.status(500).send('Error creating post');
+            return res.status(500).send('Error creating post'); // hiba eseten visszateres
         }
-        res.redirect('/forum');
+        res.redirect('/forum'); // sikeres bejegyzes utan atiranyitas a forum oldalra
     });
 };
 
+// hozzaszolas hozzaadasa
 exports.addComment = (req, res) => {
     const { content } = req.body;
     const postId = req.params.postId;
@@ -63,30 +65,32 @@ exports.addComment = (req, res) => {
 
     Comment.create(newComment, (err, results) => {
         if (err) {
-            return res.status(500).send('Error adding comment');
+            return res.status(500).send('Error adding comment'); // hiba eseten visszateres
         }
-        res.redirect('/forum');
+        res.redirect('/forum'); // sikeres hozzaszolas utan atiranyitas a forum oldalra
     });
 };
 
+// hozzaszolas torlese
 exports.deleteComment = (req, res) => {
     const commentId = req.params.commentId;
 
     Comment.delete(commentId, (err, results) => {
         if (err) {
-            return res.status(500).send('Error deleting comment');
+            return res.status(500).send('Error deleting comment'); // hiba eseten visszateres
         }
-        res.redirect('/forum');
+        res.redirect('/forum'); // sikeres torles utan atiranyitas a forum oldalra
     });
 };
 
+// bejegyzes torlese
 exports.deletePost = (req, res) => {
     const postId = req.params.postId;
 
     Post.delete(postId, (err, results) => {
         if (err) {
-            return res.status(500).send('Error deleting post');
+            return res.status(500).send('Error deleting post'); // hiba eseten visszateres
         }
-        res.redirect('/forum');
+        res.redirect('/forum'); // sikeres torles utan atiranyitas a forum oldalra
     });
 };

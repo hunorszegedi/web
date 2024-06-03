@@ -1,32 +1,43 @@
 const express = require('express');
+// mysql2 modul importalasa
 const mysql = require('mysql2');
+// session kezeleshez szukseges express-session modul importalasa
 const session = require('express-session');
+// body-parser modul importalasa a bejovo kervenyek kezelesehez
 const bodyParser = require('body-parser');
+// path modul importalasa az utvonalak kezelesere
 const path = require('path');
+// multer modul importalasa a fajlfeltolteshez
 const multer = require('multer'); 
 
+// express alkalmazas letrehozasa
 const app = express();
 
+// multer konfiguracioja a fajlfeltolteshez
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'public/images'); 
+        cb(null, 'public/images'); // a fajlok mentesi helye
     },
     filename: (req, file, cb) => {
-        cb(null, `${req.session.user.id}_${file.originalname}`); 
+        cb(null, `${req.session.user.id}_${file.originalname}`); // egyedi fajlnev letrehozasa
     }
 });
 const upload = multer({ storage: storage });
 
+// body-parser beallitasa az urlencoded es json adatok feldolgozasara
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+// public konyvtar beallitasa statikus fajlok szolgalasara
 app.use(express.static(path.join(__dirname, 'public')));
 
+// session konfiguracioja
 app.use(session({
     secret: 'secret',
     resave: true,
     saveUninitialized: true
 }));
 
+// adatbazis kapcsolat letrehozasa
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'kyrieirving',
@@ -34,20 +45,25 @@ const connection = mysql.createConnection({
     database: 'kyrieirving'
 });
 
+// adatbazis kapcsolat letrehozasa es hibakezeles
 connection.connect(err => {
     if (err) throw err;
     console.log('Connected to MySQL Database.');
 });
 
+// felhasznalo session informaciojanak beallitasa a valaszban
 app.use((req, res, next) => {
     res.locals.user = req.session.user || null;
     next();
 });
 
+// modellek importalasa
 const Game = require('./models/gameModel');
 
+// view engine beallitasa ejs-re
 app.set('view engine', 'ejs');
 
+// belepes ellenorzese middleware funkcio
 function isLoggedIn(req, res, next) {
     if (req.session.loggedin) {
         return next();
@@ -56,18 +72,22 @@ function isLoggedIn(req, res, next) {
     }
 }
 
+// fooldal megjelenitese
 app.get('/', (req, res) => {
     res.render('index', { user: req.session.user });
 });
 
+// kapcsolat oldal atranyitasa a fooldalra
 app.get('/contact', (req, res) => {
     res.redirect('/');
 });
 
+// login oldal megjelenitese
 app.get('/login', (req, res) => {
     res.render('login', { user: req.session.user });
 });
 
+// login feldolgozasa
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
     connection.query('SELECT * FROM Users WHERE email = ? AND password = ?', [email, password], (err, results) => {
@@ -82,10 +102,12 @@ app.post('/login', (req, res) => {
     });
 });
 
+// regisztracio oldal megjelenitese
 app.get('/register', (req, res) => {
     res.render('register', { user: req.session.user });
 });
 
+// regisztracio feldolgozasa
 app.post('/register', (req, res) => {
     const { name, email, password } = req.body;
     connection.query('INSERT INTO Users (name, email, password) VALUES (?, ?, ?)', [name, email, password], (err, results) => {
@@ -94,6 +116,7 @@ app.post('/register', (req, res) => {
     });
 });
 
+// dashboard oldal megjelenitese bejelentkezett felhasznaloknak
 app.get('/dashboard', isLoggedIn, (req, res) => {
     const userId = req.session.user.id;
     connection.query('SELECT * FROM Photos WHERE user_id = ? ORDER BY uploaded_at DESC LIMIT 1', [userId], (err, results) => {
@@ -103,6 +126,7 @@ app.get('/dashboard', isLoggedIn, (req, res) => {
     });
 });
 
+// profilkep feltoltese
 app.post('/uploadPhoto', upload.single('profilePhoto'), isLoggedIn, (req, res) => {
     const userId = req.session.user.id;
     const fileName = req.file.filename;
@@ -114,6 +138,7 @@ app.post('/uploadPhoto', upload.single('profilePhoto'), isLoggedIn, (req, res) =
     });
 });
 
+// forum oldal megjelenitese bejelentkezett felhasznaloknak
 app.get('/forum', isLoggedIn, (req, res) => {
     connection.query('SELECT * FROM Posts', (err, posts) => {
         if (err) throw err;
@@ -149,6 +174,7 @@ app.get('/forum', isLoggedIn, (req, res) => {
     });
 });
 
+// forum bejegyzes reszleteinek megjelenitese bejelentkezett felhasznaloknak
 app.get('/forum/:id', isLoggedIn, (req, res) => {
     const postId = req.params.id;
     connection.query('SELECT Posts.*, Users.name AS author FROM Posts INNER JOIN Users ON Posts.user_id = Users.id WHERE Posts.id = ?', [postId], (err, postResults) => {
@@ -170,6 +196,7 @@ app.get('/forum/:id', isLoggedIn, (req, res) => {
     });
 });
 
+// uj forum bejegyzes letrehozasa bejelentkezett felhasznaloknak
 app.post('/forum', isLoggedIn, (req, res) => {
     const { title, content } = req.body;
     const userId = req.session.user.id;
@@ -179,6 +206,7 @@ app.post('/forum', isLoggedIn, (req, res) => {
     });
 });
 
+// forum bejegyzesek keresese bejelentkezett felhasznaloknak
 app.get('/forum/search', isLoggedIn, (req, res) => {
     const searchQuery = req.query.query;
     connection.query(
@@ -219,7 +247,7 @@ app.get('/forum/search', isLoggedIn, (req, res) => {
     );
 });
 
-
+// meccsek oldal megjelenitese bejelentkezett felhasznaloknak
 app.get('/games', isLoggedIn, (req, res) => {
     connection.query(`
         SELECT Games.*, 
@@ -236,6 +264,7 @@ app.get('/games', isLoggedIn, (req, res) => {
     });
 });
 
+// jegyek oldal megjelenitese bejelentkezett felhasznaloknak
 app.get('/tickets', isLoggedIn, (req, res) => {
     let query;
     const params = [];
@@ -272,6 +301,7 @@ app.get('/tickets', isLoggedIn, (req, res) => {
     });
 });
 
+// jegy torlese bejelentkezett admin vagy moderator felhasznaloknak
 app.post('/delete_ticket', isLoggedIn, (req, res) => {
     if (req.session.user.role === 'admin' || req.session.user.role === 'moderator') {
         const { ticketId } = req.body;
@@ -284,6 +314,7 @@ app.post('/delete_ticket', isLoggedIn, (req, res) => {
     }
 });
 
+// jegy vasarlasi oldal megjelenitese bejelentkezett felhasznaloknak
 app.get('/tickets/buy', isLoggedIn, (req, res) => {
     connection.query(`
         SELECT Games.*, home_team.name AS home_team_name, away_team.name AS away_team_name
@@ -301,6 +332,7 @@ app.get('/tickets/buy', isLoggedIn, (req, res) => {
     });
 });
 
+// jegy vasarlas bejelentkezett felhasznaloknak
 app.post('/buy_ticket', isLoggedIn, (req, res) => {
     const { gameId, seat, price } = req.body;
     const userId = req.session.user.id;
@@ -310,16 +342,19 @@ app.post('/buy_ticket', isLoggedIn, (req, res) => {
     });
 });
 
+// auth, game, forum, ticket utvonalak importalasa
 const authRoutes = require('./routes/authRoutes');
 const gameRoutes = require('./routes/gameRoutes');
 const forumRoutes = require('./routes/forumRoutes');
 const ticketRoutes = require('./routes/ticketRoutes');
 
+// auth, game, forum, ticket utvonalak hasznalata
 app.use('/', authRoutes);
 app.use('/games', gameRoutes);
 app.use('/forum', forumRoutes);
 app.use('/tickets', ticketRoutes);
 
+// szerver inditasa a 3000-es porton
 app.listen(3000, () => {
     console.log('Server is running on http://localhost:3000');
 });
