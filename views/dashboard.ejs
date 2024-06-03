@@ -89,6 +89,43 @@
             text-decoration: underline;
         }
 
+        .profile-photo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .profile-photo img {
+            max-width: 200px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .profile-photo form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .profile-photo input[type="file"] {
+            margin-bottom: 10px;
+        }
+
+        .profile-photo button {
+            background-color: #ffd700;
+            color: #000;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .profile-photo button:hover {
+            background-color: #e5c100;
+        }
+
         footer {
             background-color: rgba(0, 0, 0, 0.8);
             color: #ffd700;
@@ -169,6 +206,28 @@
             color: #ffd700;
             font-weight: bold;
         }
+        
+        /* Add this CSS to the existing <style> block */
+
+        .custom-file-upload {
+            display: inline-block;
+            padding: 6px 12px;
+            cursor: pointer;
+            background-color: #ffd700;
+            color: #000;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .custom-file-upload:hover {
+            background-color: #e5c100;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
 
     </style>
 </head>
@@ -200,6 +259,20 @@
                 <li><a href="/games">Közelgő meccsek</a></li>
                 <li><a href="/tickets">Jegyek</a></li>
             </ul>
+            <div class="profile-photo">
+                <h3>Profilkép</h3>
+                <% if (profilePhoto) { %>
+                    <img src="<%= profilePhoto.file_path %>" alt="Profilkép">
+                <% } %>
+                <form action="/uploadPhoto" method="POST" enctype="multipart/form-data">
+                    <label for="file-upload" class="custom-file-upload">
+                        Válassz fájlt
+                    </label>
+                    <input id="file-upload" type="file" name="profilePhoto" required>
+                    <button type="submit">Feltöltés</button>
+                </form>
+            </div>
+            
         </div>
     </main>
     <footer>

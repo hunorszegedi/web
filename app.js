@@ -3,8 +3,20 @@ const mysql = require('mysql2');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
+const multer = require('multer'); // Multer importálása
 
 const app = express();
+
+// Multer konfiguráció
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'public/images'); // A fájlok mentési helye
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${req.session.user.id}_${file.originalname}`); // Egyedi fájlnév létrehozása
+    }
+});
+const upload = multer({ storage: storage });
 
 // Middleware beállítások
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -79,7 +91,27 @@ app.post('/register', (req, res) => {
 
 app.get('/dashboard', (req, res) => {
     if (req.session.loggedin) {
-        res.render('dashboard', { user: req.session.user });
+        const userId = req.session.user.id;
+        connection.query('SELECT * FROM Photos WHERE user_id = ? ORDER BY uploaded_at DESC LIMIT 1', [userId], (err, results) => {
+            if (err) throw err;
+            const profilePhoto = results.length > 0 ? results[0] : null;
+            res.render('dashboard', { user: req.session.user, profilePhoto: profilePhoto });
+        });
+    } else {
+        res.redirect('/login');
+    }
+});
+
+app.post('/uploadPhoto', upload.single('profilePhoto'), (req, res) => {
+    if (req.session.loggedin) {
+        const userId = req.session.user.id;
+        const fileName = req.file.filename;
+        const filePath = `/images/${fileName}`;
+
+        connection.query('INSERT INTO Photos (user_id, file_name, file_path) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE file_name = ?, file_path = ?', [userId, fileName, filePath, fileName, filePath], (err, results) => {
+            if (err) throw err;
+            res.redirect('/dashboard');
+        });
     } else {
         res.redirect('/login');
     }
